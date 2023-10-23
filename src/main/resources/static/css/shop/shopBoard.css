@@ -1,0 +1,48 @@
+main {
+    min-height: 50vh;
+    overflow: overlay;
+}
+
+
+.rating {
+    transform:  rotateY(180deg);
+    display: flex;
+    justify-content: center;
+}
+
+.rating label {
+    display: block;
+    cursor: pointer;
+    width: 20px;
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label::before {
+    content: '\f005';
+    font: var(--fa-font-solid);
+    position: relative;
+    display: block;
+    font-size: 20px;
+    color: #101010;
+}
+
+.rating label::after {
+    content: '\f005';
+    font: var(--fa-font-solid);
+    position: absolute;
+    display: block;
+    font-size: 20px;
+    color: #62be56;
+    top: 0;
+    opacity: 0;
+    transition: .5s;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+}
+
+
+.rating input:checked ~ label::after {
+    opacity: 1;
+}

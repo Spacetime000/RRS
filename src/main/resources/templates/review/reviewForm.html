@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function(){
+            var error = [[${error}]];
+            if (error != null)
+                alert(error);
+        });
+    </script>
+</th:block>
+<th:block layout:fragment="title">
+    <title>리뷰작성</title>
+</th:block>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/review/reviewForm.css">
+    <script src="https://kit.fontawesome.com/c7fac7a543.js" crossorigin="anonymous"></script>
+</th:block>
+<main layout:fragment="content">
+    <article class="review-form p-4">
+        <section class="review-form-header mb-4 text-center mt-3">
+            <h1>리뷰 작성</h1>
+            <div class="error" th:if="${error != null}">에러 메시지</div>
+        </section>
+        <form action="/review/new" method="post" class="form" th:object="${reviewFormDto}" enctype="multipart/form-data">
+            <input type="hidden" th:field=*{id}>
+            <input type="text" class="form-control mb-3" placeholder="제목을 입력해주세요." th:field="*{title}">
+            <textarea rows="10" placeholder="내용을 입력해주세요." class="form-control" th:field="*{content}"></textarea>
+
+            <div class="fw-bold my-2">첨부파일</div>
+            <input type="file" name="file" multiple class="my-2" >
+
+            <ul class="thumbnail my-3 p-0 d-flex" th:if="${not #lists.isEmpty(reviewFormDto.reviewFileDtoList)}">
+                <li class="me-2 d-flex flex-column align-items-center" th:each="fileDto : ${reviewFormDto.reviewFileDtoList}">
+                    <img src="https://via.placeholder.com/1000" th:src="${fileDto.fileUrl}" class="img-thumbnail me-1" alt="..." onclick="window.open(this.src)">
+                    <p class="m-0" th:text="${fileDto.oriFileName}">파일이름</p>
+                    <input type="hidden" th:value="${fileDto.id}">
+                    <a href="#" name="file-delete">삭제</a>
+                </li>
+            </ul>
+
+            <div class="fw-bold mb-2" th:if="${#strings.isEmpty(reviewFormDto.id)}">분류선택</div>
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group" th:if="${#strings.isEmpty(reviewFormDto.id)}">
+                <input type="radio" class="btn-check" name="rd-category" id="btnradio1" autocomplete="off" value="CE7" checked>
+                <label class="btn btn-outline-primary" for="btnradio1">카페</label>
+
+                <input type="radio" class="btn-check" name="rd-category" id="btnradio2" autocomplete="off" value="FD6">
+                <label class="btn btn-outline-primary" for="btnradio2">음식점</label>
+            </div>
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#myModal" th:if="${#strings.isEmpty(reviewFormDto.id)}">음식점 찾기</button>
+            <input type="hidden" th:field="*{shopId}">
+            <p class="fw-bold my-2">상호명</p>
+            <input type="text" class="form-control w-50" readonly placeholder="상호명" th:field="*{shopName}" th:readonly="${#strings.isEmpty(reviewFormDto.id) ? false : 'readonly'}">
+            <p class="fw-bold my-2">분류</p>
+            <input type="text" class="form-control w-50" readonly placeholder="분류" th:field="*{category}" th:readonly="${#strings.isEmpty(reviewFormDto.id) ? false : 'readonly'}">
+            <p class="fw-bold my-2">도로명</p>
+            <input type="text" class="form-control w-50" readonly placeholder="도로명" th:field="*{roadName}" th:readonly="${#strings.isEmpty(reviewFormDto.id) ? false : 'readonly'}">
+            <p class="fw-bold my-2">별점</p>
+            <div class="rating">
+                <input type="radio" name="rating" id="star1" value="5" th:checked="${!#strings.isEmpty(reviewFormDto.rating) && reviewFormDto.rating == 5}">
+                <label for="star1"></label>
+                <input type="radio" name="rating" id="star2" value="4" th:checked="${!#strings.isEmpty(reviewFormDto.rating) && reviewFormDto.rating == 4}">
+                <label for="star2"></label>
+                <input type="radio" name="rating" id="star3" value="3" th:checked="${!#strings.isEmpty(reviewFormDto.rating) && reviewFormDto.rating == 3}">
+                <label for="star3"></label>
+                <input type="radio" name="rating" id="star4" value="2" th:checked="${!#strings.isEmpty(reviewFormDto.rating) && reviewFormDto.rating == 2}">
+                <label for="star4"></label>
+                <input type="radio" name="rating" id="star5" value="1" checked="checked" th:checked="${#strings.isEmpty(reviewFormDto.rating) || reviewFormDto.rating == 1}">
+                <label for="star5"></label>
+            </div>
+            <div class="m-5 d-flex justify-content-center d-flex justify-content-between">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button class="btn-cir w-25" type="submit" th:if="${#strings.isEmpty(reviewFormDto.id)}">등록</button>
+                <button class="btn btn-primary w-25" type="button" th:unless="${#strings.isEmpty(reviewFormDto.id)}">취소</button>
+                <button class="btn btn-primary w-25" type="submit" th:unless="${#strings.isEmpty(reviewFormDto.id)}" th:formaction="@{'/review/update/' + *{id}}">수정</button>
+                <button class="btn btn-primary w-25" type="button" th:unless="${#strings.isEmpty(reviewFormDto.id)}" th:onclick="|location.href='@{/review/del/{reviewId}(reviewId=${reviewFormDto.id})}'|">삭제</button>
+            </div>
+        </form>
+    </article>
+
+    <div class="modal fade" id="myModal" tabindex="-1" data-bs-backdrop="static" th:if="${#strings.isEmpty(reviewFormDto.id)}">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <input type="search" placeholder="검색">
+                    <button class="btn btn-primary mx-2" id="search" type="button">검색</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" id="modalClose"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="w-100">
+                        <thead>
+                        <tr>
+                            <th class="shop-name">상호명</th>
+                            <th class="category">분류</th>
+                            <th class="road-name">도로명</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/reviewForm.js"></script>
+    <script src="/js/updateReviewForm.js"></script>
+
+</main>
+
+</html>

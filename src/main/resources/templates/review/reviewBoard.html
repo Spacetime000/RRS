@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+    </script>
+</th:block>
+<th:block layout:fragment="title">
+    <title>리뷰</title>
+</th:block>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/review/reviewBoard.css">
+    <script src="https://kit.fontawesome.com/c7fac7a543.js" crossorigin="anonymous"></script>
+</th:block>
+<main layout:fragment="content">
+    <article class="table">
+        <section class="table-header d-flex justify-content-end py-3 mx-3">
+            <button class="btn btn-primary pd-3" sec:authorize="isAuthenticated()" th:onclick="|location.href='@{/review/new}'|">리뷰 작성</button>
+        </section>
+        <section class="table-body my-3 d-flex justify-content-center">
+            <table>
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>분류</th>
+                    <th>상호명</th>
+                    <th>리뷰제목</th>
+                    <th>점수</th>
+                    <th>작성자</th>
+                    <th>작성날짜</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="page, loop : ${pages}">
+                    <td th:text="${pages.totalElements - (loop.index + (pages.number * pages.size))}">10</td>
+                    <td th:text="${page.category}">양식</td>
+                    <td><a href="#" class="fw-bold" th:text="${page.shopName}" th:href="@{'/review/dtl/' + ${page.id}}">돈까스집</a></td>
+                    <td th:text="${page.title}">돈까스 리뷰</td>
+                    <td>
+                        <div class="rating my-3">
+                            <input type="radio" name="start" id="star1" value="5" onclick="return(false);" th:name="'start' + ${page.id}" th:checked="${page.rating == 5}">
+                            <label for="star1"></label>
+                            <input type="radio" name="start" id="star2" value="4" onclick="return(false);" th:name="'start' + ${page.id}" th:checked="${page.rating == 4}">
+                            <label for="star2"></label>
+                            <input type="radio" name="start" id="star3" value="3" onclick="return(false);" th:name="'start' + ${page.id}" th:checked="${page.rating == 3}">
+                            <label for="star3"></label>
+                            <input type="radio" name="start" id="star4" value="2" onclick="return(false);" th:name="'start' + ${page.id}" th:checked="${page.rating == 2}">
+                            <label for="star4"></label>
+                            <input type="radio" name="start" id="star5" value="1" onclick="return(false);" th:name="'start' + ${page.id}" th:checked="${page.rating == 1}">
+                            <label for="star5"></label>
+                        </div>
+                    </td>
+                    <td th:text="${page.createBy}">
+                        작성자 닉네임
+                    </td>
+                    <td th:text="${#temporals.format(page.createTime, 'yyyy-MM-dd')}">
+                        2022.02.02
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </section>
+        <section class="table-footer d-flex justify-content-center"
+                 th:with="start=${(pages.number/maxPage)*maxPage + 1}, end=(${(pages.totalPages == 0) ? 1 : (start + (maxPage - 1) < pages.totalPages ? start + (maxPage - 1) : pages.totalPages)})">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${pages.number eq 0} ? 'disabled' : ''">
+                    <a href="" class="page-link" th:href="@{|?page=${pages.number - 1}|}">
+                        <span>Previous</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}" th:classappend="${pages.number eq page-1} ? 'active' : ''">
+                    <a href="" class="page-link" th:href="@{|?page=${page-1}|}" th:text="${page}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${pages.number+1 ge pages.totalPages} ? 'disabled' : ''">
+                    <a href="" class="page-link" th:href="@{|?page=${pages.number + 1}|}">
+                        <span>Next</span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+    </article>
+</main>
+
+</html>

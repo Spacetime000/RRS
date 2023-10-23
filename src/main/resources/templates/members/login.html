@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+<th:block layout:fragment="script">
+
+</th:block>
+
+<script th:inline="javascript">
+
+</script>
+<th:block layout:fragment="css">
+  <link rel="stylesheet" href="/css/members/login.css">
+</th:block>
+<main layout:fragment="content">
+  <!-- 로그인 START -->
+  <section class="d-flex justify-content-center align-items-center">
+    <div class="d-flex justify-content-center align-items-center">
+      <form action="/members/login" method="post" autocomplete="off">
+        <div class="login-title">로그인</div>
+        <div th:if=${loginError} th:text=${loginError} class="text-center">로그인 에러 메시지</div>
+        <div class="inputbox">
+          <input type="email" required name="email" id="email">
+          <label>Email</label>
+        </div>
+        <div class="inputbox">
+          <input type="password" required name="password" id="password">
+          <label>Password</label>
+        </div>
+        <button class="btn-login" type="submit">
+          로그인
+        </button>
+        <div class="register">
+          <a href="" th:href="@{/members/register}">회원가입</a>
+        </div>
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+      </form>
+    </div>
+  </section>
+  <!-- 로그인 END -->
+</main>
+
+</html>

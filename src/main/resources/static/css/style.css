@@ -1,0 +1,162 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    padding: 30px 0;
+    background: #333;
+    color: #fff;
+}
+
+@font-face {
+    font-family: 'HS-Regular';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/HS-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'OTWelcomeBA';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2110@1.0/OTWelcomeBA.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.navbar-brand {
+    font-family: 'HS-Regular';
+}
+
+.navbar {
+    background: #40513B;
+}
+
+a.navbar-brand {
+    color: #9DC08B;
+    font-size: 2rem;
+}
+
+.carousel img {
+    height: 720px;
+}
+
+.card {
+    text-decoration: none;
+}
+
+.card img {
+    aspect-ratio: 4/3;
+}
+
+.btn-success {
+    letter-spacing: .5rem;
+}
+
+.profile {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.collapse {
+    font-family: 'OTWelcomeBA';
+    font-size: 1.5rem;
+}
+
+.collapse a {
+    color: #EDF1D6;
+}
+
+main {
+    background: url(/img/background.jpg) no-repeat;
+    background-size: cover;
+}
+
+footer {
+    background: #9DC08B;
+    color: #40513B;
+}
+
+.main-title {
+    font-family: 'OTWelcomeBA';
+    font-size: 5rem;
+    letter-spacing: 0.5rem;
+    color: #40513B;
+    text-shadow: #9DC08B 3px 3px;
+}
+
+div.offcanvas {
+    background: #EDF1D6;
+}
+
+.offcanvas-body p {
+    color: #40513B;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: .1rem;
+}
+
+.offcanvas-body li a {
+    color: #609966;
+    font-weight: 600;
+}
+
+/* 버튼 */
+.btn-cir {
+    border: none;
+    min-height: 50px;
+    background: linear-gradient(
+        90deg,
+        rgba(129, 230, 217, 1) 0%,
+        rgba(237, 241, 214, 1) 100%
+    );
+    border-radius: 1000px;
+    color: darkslategray;
+    cursor: pointer;
+    box-shadow: 12px 12px 24px rgba(79, 209, 197, 0.64);
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+.btn-cir:hover {
+    transform: scale(1.2);
+}
+
+.btn-cir:hover:after {
+    content: "";
+    width: 30px;
+    height: 30px;
+    z-index: -1;
+    border: 6px solid #00ffcb;
+    border-radius: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: ring 1.5s infinite;
+    position: absolute;
+}
+
+@keyframes ring {
+    0% {
+        width: 30px;
+        height: 30px;
+        opacity: 1;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+<th:block layout:fragment="script">
+
+</th:block>
+
+<main layout:fragment="content">
+    <!-- 광고 배너 START -->
+    <div class="carousel slide" id="carouselBanner">
+        <div class="carousel-inner">
+            <div class="carousel-item" th:each="banner : ${bannerList}" th:classappend="${bannerStat.index == 0} ? 'active' : ''">
+                <img src="https://via.placeholder.com/1000" alt="" class="d-block w-100" th:src="${banner.fileUrl}">
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselBanner" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselBanner" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <!-- 광고 배너 END -->
+
+    <!-- 음식점 리스트 카드 START -->
+    <div class="container py-4 py-md-5" id="list-card">
+        <div class="text-center pt-4 pt-md-5 mb-5 main-title" th:if="${not #lists.isEmpty(mainShopList)}">추천 리스트</div>
+        <div class="row">
+            <div class="col-md-4 mb-5" th:each="shop : ${mainShopList}">
+                <a href="" class="card border-0 shadow" th:href="@{|/shop/dtl/${shop.id}|}">
+                    <img src="https://via.placeholder.com/1000" alt="" class="card-img-top" th:src="${shop.imgUrl}">
+                    <div class="card-body py-4 text-center text-dark">
+                        <div class="bg-danger rounded-1 px-1 py-1 text-white fs-5 fw-bold" th:text="${shop.category}">양식</div>
+                        <h3 class="my-3 card-title" th:text="${shop.name}">FoodShopName</h3>
+                        <div class="text-center text-muted fs-6" th:text="${shop.roadName}">
+                            서울 강남구 언주로 170길 22 지하 1층
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- 음식점 리스트 카드 END -->
+</main>
+</html>

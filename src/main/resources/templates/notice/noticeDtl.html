@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+    </script>
+</th:block>
+<th:block layout:fragment="title">
+    <title th:text=#{notice.form.title.create}>공지 작성</title>
+</th:block>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/notice/noticeForm.css">
+</th:block>
+<main layout:fragment="content" class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center align-items-center w-75">
+        <form action="post" class="w-75" th:object=${noticeFormDto} enctype="multipart/form-data">
+            <input type="hidden" th:field=*{id}>
+            <div class="inputbox">
+                <h1 th:text=*{title}>공지사항 작성</h1>
+            </div>
+            <hr class="my-3">
+            <div class="inputbox">
+                <pre th:text="*{content}"></pre>
+            </div>
+            <hr class="my-3">
+            <!-- 첨부파일 존재시 -->
+            <div class="inputbox" th:if="${not #lists.isEmpty(noticeFormDto.noticeFileDtoList)}">
+                <div class="fw-bold">첨부파일</div>
+                <div th:each="noticeFileDto : ${noticeFormDto.noticeFileDtoList}">
+                    <a href="#" th:text="${noticeFileDto.oriFileName}" th:href="@{'/notice/fileDown/' + ${noticeFileDto.id}}"></a>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center mb-3">
+                <button class="btn btn-primary" type="button" th:onclick="|location.href='@{/notice/board}'|">목록</button>
+                <button class="btn btn-primary" type="button" th:onclick="|location.href='@{/notice/update/{noticeId}(noticeId=${noticeFormDto.id})}'|" sec:authorize="hasRole('ADMIN')">수정</button>
+            </div>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        </form>
+    </div>
+
+</main>
+
+</html>

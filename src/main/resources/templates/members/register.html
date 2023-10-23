@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+
+<th:block layout:fragment="script">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function(){
+            var error = [[${error}]]
+            const modal = document.getElementById('modal');
+            const modalBtnSearch = document.getElementById("modal-btn-search");
+            const modalValid = document.getElementById('modal-valid');
+            const modalInvalid = document.getElementById('modal-invalid');
+            const modalInput = document.getElementById('modal-input');
+            const modalBtnUse = document.getElementById('modal-btn-use');
+            let header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+            let token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+            let key;
+            let isEmail = false;
+            let isNickname = false;
+    
+            if(error != null) {
+                alert(error);
+            }
+
+            //카카오
+            document.getElementById('btn-addr').addEventListener('click', () => {
+                new daum.Postcode({
+                    oncomplete: function(data) {
+                        document.getElementById('zoneCode').value = data.zonecode;
+                        document.getElementById('roadName').value = data.roadAddress;
+                        document.getElementById("detailedAddress").focus();
+                    }
+                }).open();
+            });
+    
+            function reset() {
+                console.log("리셋 동작");
+                modalInput.classList.remove('is-invalid');
+                modalInput.classList.remove('is-valid');
+                modalInput.value="";
+                modalInput.removeAttribute('readonly');
+                modalBtnUse.style.display = "none";
+                modalBtnSearch.style.display = "";
+            }
+    
+            modal.addEventListener('show.bs.modal', function(e) {
+                reset();
+                const button = e.relatedTarget;
+                const modalTitle = modal.querySelector('.modal-title');
+                key = button.getAttribute("data-key");
+                if (key === "email") {
+                    modalTitle.textContent = [[#{register.modal.title.email}]]; //이메일 검색 타이틀
+                    modalInput.placeholder = [[#{register.placeholder.email}]]; //이메일 placeholder
+                } else if(key === "nickname") {
+                    modalTitle.textContent = [[#{register.modal.title.nickname}]]; //닉네임 검색 타이틀
+                    modalInput.placeholder = [[#{register.placeholder.nickname}]]; //닉네임 placeholder
+                }
+            });
+
+            //초기화 클릭
+            document.getElementById('modal-btn-cancel').addEventListener('click', function() {
+                reset();
+            });
+
+            //사용
+            modalBtnUse.addEventListener('click', function() {
+ 
+                switch(key) {
+                    case "email":
+                        document.getElementById('email').value = modalInput.value;;
+                        isEmail = true;
+                        break;
+                    case "nickname":
+                        document.getElementById('nickname').value = modalInput.value;;
+                        isNickname = true;
+                        break;
+                    default :
+                        alert("에러");
+                        break;
+                }
+                document.getElementById('modal-close').click();
+            });
+            
+            //중복 검색
+            modalBtnSearch.addEventListener("click", function() {
+                let regEmail = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+$/;
+                let regNick = /^[A-Za-z0-9가-힣]{3,8}$/;
+
+                //표현식 처리
+                if (key === "email" && !regEmail.test(modalInput.value)) {
+                    modalInput.classList.add('is-invalid');
+                    modalInput.classList.remove('is-valid');
+                    modalInvalid.textContent = [[#{Email.registerDto.email}]]; //올바른 형식 입력
+                    return;
+                } else if(key === "nickname" && !regNick.test(modalInput.value)) {
+                    modalInput.classList.add('is-invalid');
+                    modalInput.classList.remove('is-valid');
+                    modalInvalid.textContent = [[#{Error.register.nickname}]]; //특수문자x 글자 3~8 
+                    return;
+                }
+
+                let xhr = new XMLHttpRequest();
+                
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) { //응답완료
+                            if (xhr.responseText === 'true') { //중복 없음.
+                                modalInput.classList.remove('is-invalid');
+                                modalInput.classList.add('is-valid');
+                                modalInput.setAttribute('readonly', true);
+                                modalValid.textContent = [[#{Error.register.available}]]; //검증 메시지 - 사용가능
+                                modalBtnUse.style.display = "";
+                                modalBtnSearch.style.display = "none";
+                            } else { //중복 있음.
+                                modalInput.classList.add('is-invalid');
+                                modalInvalid.textContent = [[#{Error.register.used}]]; //사용중
+                            }
+                        } else { //응답실패
+                            modalInput.classList.add('is-invalid');
+                            modalInvalid.textContent = [[#{Error}]]; //문제가 발생했습니다. 재시도 해주세요
+                        }
+                    }
+                }
+
+                let paramData = {
+                    source : modalInput.value,
+                    key : key
+                };
+
+                let param = JSON.stringify(paramData);
+                xhr.open("POST", "/members/vd", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.setRequestHeader(header, token);
+                xhr.send(param);
+
+            });
+
+            //회원가입 버튼 동작
+            document.getElementsByClassName("btn-register")[0].addEventListener('click', function() {
+                console.log("회원가입 버튼 동작!");
+
+                let pw = document.querySelectorAll("input[type='password']");
+                let pw1 = pw[0].value.length;
+
+                if (pw[0].value != pw[1].value) {
+                    pw[0].classList.add('is-invalid');
+                    pw[1].classList.add('is-invalid');
+                    alert([[#{Error.register.pw_check}]]); //비밀번호와 비밀번호 확인 서로 다름.
+                    return;
+                } else if (pw1 < 8 || pw1 > 16) {
+                    alert([[#{Error.register.pw_length}]]); //비밀번호 길이
+                    return;
+                }
+
+                let regTel = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{3,4}$/;
+                let tel = document.getElementById('tel');
+
+                if (!regTel.test(tel.value)) {
+                    tel.classList.add('is-invalid');
+                    alert("연락처를 올바르게 작성해주세요.")
+                    return;
+                }
+
+                if (isEmail == true && isNickname == true) {
+                    document.getElementById("form").submit();
+                } else {
+                    alert("이메일 및 닉네임을 입력해주세요.")
+                }
+            });
+
+        });
+
+
+    </script>
+</th:block>
+<th:block layout:fragment="title">
+    <title>[[#{register.title}]]</title>
+</th:block>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/members/register.css">
+</th:block>
+<main layout:fragment="content">
+    <section class="d-flex justify-content-center align-items-center">
+        <div class="d-flex justify-content-center align-items-center">
+            <form action="" method="post" th:object="${registerDto}" id="form">
+                <div class="register-title" th:text="#{register.title}">회원가입</div>
+                <div class="fw-bold text-center" th:text="#{register.description}">회원이 되어 다양한 경험을 즐기세요!</div>
+                <div class="inputbox">
+                    <div class="input-text" th:text="#{register.id}">이메일</div>
+                    <input type="email" class="form-control w-75" placeholder="이메일" th:placeholder="#{register.id}"
+                           readonly th:field="*{email}" th:errorclass="is-invalid">
+                    <div class="invalid-feedback" th:errors="*{email}">이미 가입된 이메일입니다.</div>
+                    <button type="button" class="w-25 w-btn"
+                            data-bs-toggle="modal" data-bs-target="#modal" data-key="email" th:text="#{register.button.overlap}">
+                        중복 검색
+                    </button>
+                </div>
+                <div class="inputbox">
+                    <div class="input-text" th:text="#{register.pw}">비밀번호</div>
+                    <input type="password" class="form-control" placeholder="비밀번호 입력"
+                           th:placeholder="#{register.placeholder.pw}" th:errorclass="is-invalid" th:field="*{password}">
+                    <div class="invalid-feedback" th:errors="*{password}">비밀번호를 입력해주세요.</div>
+                </div>
+                <div class="inputbox">
+                    <div class="input-text" th:text="#{register.pw2}">비밀번호 확인</div>
+                    <input type="password" class="form-control" placeholder="비밀번호 재입력"
+                           th:placeholder="#{register.placeholder.pw2}">
+                    <div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+                </div>
+                <div class="inputbox">
+                    <div class="input-text" th:text="#{register.nickname}">닉네임</div>
+                    <input type="text" class="form-control w-75" placeholder="닉네임 입력"
+                           th:placeholder="#{register.placeholder.nickname}" readonly th:errorclass="is-invalid" th:field="*{nickname}">
+                    <div class="invalid-feedback" th:errors="*{nickname}">이미 가입된 닉네임입니다.</div>
+                    <button class="w-25 w-btn" type="button"
+                            data-bs-toggle="modal" data-bs-target="#modal" data-key="nickname" th:text="#{register.button.overlap}">
+                        중복 검색
+                    </button>
+                </div>
+                <div class="inputbox">
+                    <div class="input-text" th:text="#{register.sex}">성별</div>
+                    <select class="form-select" th:field="*{sex}">
+                        <option value="M" selected th:text="#{register.sex.male}">남성</option>
+                        <option value="F" th:text="#{register.sex.female}">여성</option>
+                    </select>
+                </div>
+                <div class="inputbox">
+                    <div class="input-text" th:text="#{register.birth}">생년월일</div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <select class="form-select w-25" th:field="*{year}">
+                            <option th:each="count : ${#numbers.sequence(2023, 1910, -1)}" th:value="${count}" th:text="${count}"></option>
+                        </select>
+                        <div th:text="#{register.year}">년</div>
+                        <select class="form-select w-25" th:field="*{month}">
+                            <option th:each="count : ${#numbers.sequence(1, 12)}" th:value="${count}" th:text="${count}"></option>
+                        </select>
+                        <div th:text="#{register.month}">월</div>
+                        <select class="form-select w-25" th:field="*{day}">
+                            <option th:each="count : ${#numbers.sequence(1, 31)}" th:value="${count}" th:text="${count}"></option>
+                        </select>
+                        <div th:text="#{register.day}">일</div>
+                    </div>
+                </div>
+                <div class="inputbox">
+                    <div class="input-text" th:text="#{register.tel}">연락처</div>
+                    <input type="tel" class="form-control" placeholder="전화번호 입력('-' 포함 입력)"
+                           required th:errorclass="is-invalid" th:field="*{tel}" th:placeholder="#{register.placeholder.tel}">
+                    <div class="invalid-feedback" th:errors="*{tel}">올바른 형태로 작성해주세요.</div>
+                </div>
+                <div class="inputbox">
+                    <div class="input-text" th:text="#{register.zipcode}">우편번호</div>
+                    <input type="text" class="form-control w-50 mb-2" placeholder="우편번호"
+                           th:placeholder="#{register.zipcode}" th:field="*{zoneCode}">
+                    <input type="text" class="form-control mb-2" placeholder="도로명"
+                           th:field="*{roadName}" th:placeholder="#{register.roadName}">
+                    <input type="text" class="form-control mb-2" placeholder="상세주소"
+                           th:field="*{detailedAddress}" th:placeholder="#{register.detailedAddress}">
+                    <button class="w-btn" type="button" id="btn-addr" th:text="#{register.button.addressSearch}">주소 찾기</button>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="btn-register" th:text="#{register.button.signUp}">회원가입</button>
+                </div>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            </form>
+        </div>
+    </section>
+    <!-- 로그인 END -->
+
+    <!-- 모달 START-->
+    <div class="modal fade" id="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-center w-100">중복 검사</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" id="modal-close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <input id="modal-input" type="text" class="form-control" placeholder="입력해주세요">
+                            <label class="valid-feedback" id="modal-valid">사용 가능합니다.</label>
+                            <label class="invalid-feedback" id="modal-invalid">올바른 형식으로 입력해주세요.</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" style="display: none;" id="modal-btn-use" th:text=#{register.button.select}>사용하기</button>
+                    <button type="button" class="btn btn-primary" id="modal-btn-search" th:text=#{register.button.overlap}>중복 검색</button>
+                    <button type="button" class="btn btn-secondary" id="modal-btn-cancel" th:text=#{register.button.reset}>초기화</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 모달 END -->
+</main>
+
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+    </script>
+</th:block>
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/shop/shopDtl.css">
+    <script src="https://kit.fontawesome.com/c7fac7a543.js" crossorigin="anonymous"></script>
+</th:block>
+<main layout:fragment="content">
+    <div class="frame p-5">
+        <p class="category px-3 py-1 fw-bold text-center mx-auto w-25" th:text="${shop.category}">한식</p>
+        <h1 class="mb-3 text-center" th:text="${shop.name}">상호이름</h1>
+        <p class="text-center" th:text="${shop.roadName}">도로명</p>
+        <div class="rating my-3">
+            <input type="radio" name="start" id="star1" value="5" onclick="return(false);" th:checked="${shop.rating == 5}">
+            <label for="star1"></label>
+            <input type="radio" name="start" id="star2" value="4" onclick="return(false);" th:checked="${shop.rating == 4}">
+            <label for="star2"></label>
+            <input type="radio" name="start" id="star3" value="3" onclick="return(false);" th:checked="${shop.rating == 3}">
+            <label for="star3"></label>
+            <input type="radio" name="start" id="star4" value="2" onclick="return(false);" th:checked="${shop.rating == 2}">
+            <label for="star4"></label>
+            <input type="radio" name="start" id="star5" value="1" onclick="return(false);" th:checked="${shop.rating == 1}">
+            <label for="star5"></label>
+        </div>
+        <p class="text-center">작성된 리뷰 수 : [[${#lists.size(shop.shopReviewDtoList)}]]</p>
+        <hr class="my-3">
+        <table class="mx-auto">
+            <thead>
+                <tr>
+                    <th>대표이미지</th>
+                    <th>제목</th>
+                    <th>점수</th>
+                    <th>작성자</th>
+                    <th>작성날짜</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="review : ${shop.shopReviewDtoList}">
+                    <td class="thumbnail">
+                        <img src="https://via.placeholder.com/1000" class="img-thumbnail" onclick="window.open(this.src)" th:src="${review.thumbnail}">
+                    </td>
+                    <td><a href="#" th:href="@{'/review/dtl/' + ${review.id}}" th:text="${review.title}">리뷰 제목 글</a></td>
+                    <td>
+                        <div class="rating my-3">
+                            <input type="radio" th:id="'star1' + ${review.id}" name="start" th:name="'star' + ${review.id}" value="5" onclick="return(false);" th:checked="${review.rating == 5} ? 'checked' : 'false'">
+                            <label for="star1" th:for="'star1' + ${review.id}"></label>
+                            <input type="radio" th:id="'star2' + ${review.id}" name="start" th:name="'star' + ${review.id}" value="4" onclick="return(false);" th:checked="${review.rating == 4} ? 'checked' : 'false'">
+                            <label for="star2" th:for="'star2' + ${review.id}"></label>
+                            <input type="radio" th:id="'star3' + ${review.id}" name="start" th:name="'star' + ${review.id}" value="3" onclick="return(false);" th:checked="${review.rating == 3} ? 'checked' : 'false'">
+                            <label for="star3" th:for="'star3' + ${review.id}"></label>
+                            <input type="radio" th:id="'star4' + ${review.id}" name="start" th:name="'star' + ${review.id}" value="2" onclick="return(false);" th:checked="${review.rating == 2} ? 'checked' : 'false'">
+                            <label for="star4" th:for="'star4' + ${review.id}"></label>
+                            <input type="radio" th:id="'star5' + ${review.id}" name="start" th:name="'star' + ${review.id}" value="1" onclick="return(false);" th:checked="${review.rating == 1} ? 'checked' : 'false'">
+                            <label for="star5" th:for="'star5' + ${review.id}"></label>
+                        </div>
+                    </td>
+                    <td th:text="${review.createBy}">작성자 닉네임</td>
+                    <td th:text="${#temporals.format(review.createTime, 'yyyy-MM-dd')}">2022.02.02</td>
+                </tr>
+            </tbody>
+        </table>
+        <hr>
+        </section>
+        <div class="text-center my-3">
+            <button class="btn btn-primary w-25" type="button" th:onclick="|location.href='@{/shop/board}'|">목록</button>
+        </div>
+    </div>
+</main>
+
+</html>

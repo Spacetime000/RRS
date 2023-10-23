@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function(){
+            const search = document.querySelector(".input-gp input");
+            const tableRows = document.querySelectorAll('tbody tr');
+
+            search.addEventListener('input', searchTable);
+
+            function searchTable() {
+                tableRows.forEach((row, i) => {
+                    let tableData = row.querySelector('a').textContent.toLocaleLowerCase();
+                    let searchData = search.value.toLocaleLowerCase();
+        
+                    row.classList.toggle('hide', tableData.indexOf(searchData) < 0);
+                    row.style.setProperty('--delay', i / 25 + 's');
+                });
+
+                document.querySelectorAll('tbody tr:not(.hide)').forEach((visible_row, i) => {
+                    visible_row.style.backgroundColor = (i % 2 == 0) ? 'transparent' : '#0000000b';
+                });
+            }
+        });
+        
+    </script>
+</th:block>
+<th:block layout:fragment="title">
+    <title >공지사항</title>
+</th:block>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/notice/noticeBoard.css">
+</th:block>
+<main layout:fragment="content">
+    <article class="table">
+        <section class="table-header">
+            <h1>공지사항</h1>
+            <button class="btn btn-primary" sec:authorize="hasRole('ADMIN')" th:onclick="|location.href='@{/notice/new}'|">글쓰기</button>
+            <div class="input-gp">
+                <input type="search" placeholder="검색">
+                <img src="/img/search.svg" alt="">
+            </div>
+        </section>
+        <section class="table-body">
+            <table>
+                <thead>
+                <tr>
+                    <th class="title">제목</th>
+                    <th class="date">날짜</th>
+                </tr>
+                </thead>
+                <tbody th:each="noticeBoardDto : ${noticeBoardDtoList}">
+                <tr>
+                    <td><a href="#" th:href="@{/notice/dtl/{id}(id=${noticeBoardDto.id})}" th:text="${noticeBoardDto.title}">공지01</a></td>
+                    <td th:text="${#temporals.format(noticeBoardDto.createTime, 'yyyy-MM-dd')}">2022.02.22</td>
+                </tr>
+                
+                </tbody>
+            </table>
+        </section>
+    </article>
+</main>
+
+</html>

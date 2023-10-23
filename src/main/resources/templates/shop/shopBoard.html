@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+    </script>
+</th:block>
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/shop/shopBoard.css">
+    <script src="https://kit.fontawesome.com/c7fac7a543.js" crossorigin="anonymous"></script>
+</th:block>
+<main layout:fragment="content">
+    <form class="d-flex w-50 justify-content-center mx-auto mt-5" th:object="${shopSearchDto}">
+        <select class="form-control mx-3 w-25" th:field="*{searchCategory}">
+            <option value="all">전체조회</option>
+            <option value="카페" th:each="category : ${categoryList}" th:value="${category}" th:text="${category}">카페</option>
+        </select>
+        <select class="form-control mx-3 w-25" th:field="*{searchBy}">
+            <option value="shopName">상호명</option>
+            <option value="address">주소</option>
+        </select>
+        <input type="text" class="form-control mx-3 w-25" placeholder="검색어를 입력해주세요" th:field="*{searchQuery}">
+        <button type="button" class="btn btn-primary w-25" id="search-btn">검색</button>
+    </form>
+    <div class="container py-4 py-md-5" id="list-card">
+        <div class="row">
+            <div class="col-md-4 mb-5" th:each="page : ${pages}">
+                <a href="#" class="card border-0 shadow" th:href="@{'/shop/dtl/' + ${page.id}}">
+                    <img src="https://via.placeholder.com/1000" alt="" class="card-img-top" th:src="${page.imgUrl}">
+                    <div class="card-body py-4 text-center text-dark">
+                        <div class="bg-danger rounded-1 px-1 py-1 text-white fs-5 fw-bold" th:text="${page.category}">양식</div>
+                        <h3 class="my-3 card-title" th:text="${page.shopName}">FoodShopName</h3>
+                        <div class="text-center text-muted fs-6 mb-3" th:text="${page.roadName}">
+                            서울 강남구 언주로 170길 22 지하 1층
+                        </div>
+                        <div class="rating" th:if="${page.rating > 0}">
+                            <input type="radio" name="start" id="star1" value="5" onclick="return(false);" th:name="'star' + ${page.id}" th:checked="${page.rating == 5}">
+                            <label for="star1"></label>
+                            <input type="radio" name="start" id="star2" value="4" onclick="return(false);" th:name="'star' + ${page.id}" th:checked="${page.rating == 4}">
+                            <label for="star2"></label>
+                            <input type="radio" name="start" id="star3" value="3" onclick="return(false);" th:name="'star' + ${page.id}" th:checked="${page.rating == 3}">
+                            <label for="star3"></label>
+                            <input type="radio" name="start" id="star4" value="2" onclick="return(false);" th:name="'star' + ${page.id}" th:checked="${page.rating == 2}">
+                            <label for="star4"></label>
+                            <input type="radio" name="start" id="star5" value="1" onclick="return(false);" th:name="'star' + ${page.id}" th:checked="${page.rating == 1}">
+                            <label for="star5"></label>
+                        </div>
+                        <div class="text-center" th:if="${page.rating == 0}">
+                            리뷰 없음.
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <section class="table-footer d-flex justify-content-center"
+             th:with="start=${(pages.number/maxPage)*maxPage + 1}, end=(${(pages.totalPages == 0) ? 1 : (start + (maxPage - 1) < pages.totalPages ? start + (maxPage - 1) : pages.totalPages)})">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${pages.number eq 0} ? 'disabled' : ''">
+                <a href="#" class="page-link" th:onclick="'javascript:page(' + ${pages.number - 1} + ')'">
+                    <span>Previous</span>
+                </a>
+            </li>
+            <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}" th:classappend="${pages.number eq page-1} ? 'active' : ''">
+                <a href="#" class="page-link" th:onclick="'javascript:page(' + ${page - 1} + ')'" th:text="${page}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${pages.number+1 ge pages.totalPages} ? 'disabled' : ''">
+                <a href="#" class="page-link" th:onclick="'javascript:page(' + ${pages.number + 1} + ')'">
+                    <span>Next</span>
+                </a>
+            </li>
+        </ul>
+    </section>
+    <script src="/js/shopBoard.js"></script>
+</main>
+
+</html>

@@ -1,0 +1,86 @@
+section {
+    min-height: 100%;
+}
+
+section > div {
+    background: transparent;
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(15px);
+}
+
+
+.login-title {
+    text-align: center;
+    color: #40513B;
+    font-size: 3rem;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+.inputbox {
+    position: relative;
+    margin: 30px 0;
+    border-bottom: 2px solid #fff;
+    width: 400px;
+}
+
+.inputbox label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    color: #333;
+    font-size: 1rem;
+    transition: .5s;
+}
+
+.inputbox input {
+    width: 100%;
+    height: 50px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 0 35px 0 5px;
+    color: #40513B;
+}
+
+input:focus ~ label,
+input:valid ~ label {
+    top: -8px;
+}
+
+input:checked ~ label{
+    color: red;
+}
+
+.btn-login {
+    width: 100%;
+    height: 50px;
+    border-radius: 50px;
+    border: none;
+    outline: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: .2rem;
+    margin-top: 30px;
+}
+
+.register {
+    font-size: 1rem;
+    margin: 30px 0 20px;
+    text-align: center;
+}
+
+.register a {
+    text-decoration: none;
+    color: #40513B;
+    font-weight: 600;
+}
+
+.register a:hover {
+    text-decoration: underline;
+}

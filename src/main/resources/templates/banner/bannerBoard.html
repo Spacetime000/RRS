@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+    </script>
+</th:block>
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/banner/bannerBoard.css">
+    <script src="https://kit.fontawesome.com/c7fac7a543.js" crossorigin="anonymous"></script>
+</th:block>
+<main layout:fragment="content" class="d-flex justify-content-center align-items-center">
+    <article class="p-3">
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-primary my-3" type="button" th:onclick="|location.href='@{/banner/new}'|">추가</button>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>이미지 이름</th>
+                <th>이미지</th>
+                <th>노출여부</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="banner : ${bannerList}">
+                <td th:text="${banner.oriFileName}">이미지 이름1</td>
+                <td><img src="https://via.placeholder.com/500x300" onclick="window.open(this.src)" th:src="${banner.fileUrl}"></td>
+                <td th:text="${banner.state}" class="text-center">노출</td>
+                <td>
+                    <button class="btn btn-primary me-3" type="button" th:onclick="|location.href='@{/banner/update/{id}(id=${banner.id})}'|">수정</button>
+                    <input type="hidden" id="id" name="id" th:value="${banner.id}">
+                    <button class="btn btn-danger" type="button" name="delete-btn">삭제</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </article>
+    <script>
+        let header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        let token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+
+        document.getElementsByName("delete-btn").forEach(e => {
+            e.addEventListener("click", t => {
+                t.preventDefault;
+
+                var id = e.previousElementSibling.value;
+
+                if(confirm("삭제하시겠습니까?")) {
+                    fetch("/banner/delete/" + id, {
+                        method: 'DELETE',
+                        headers: {[header] : token},
+                    })
+                    .then(response => {
+                        window.location.replace("/banner/board");
+                    })
+                    .catch((error) => console.error("에러", error));
+                }
+            });
+        });
+
+
+    </script>
+</main>
+
+</html>

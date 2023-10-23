@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<header th:fragment="header" class="sticky-top bg-light">
+
+    <nav class="d-flex justify-content-between">
+        <div class="navbar navbar-expand-md w-100">
+            <!-- 로고 START -->
+            <a href="#" class="navbar-brand ms-5" th:href="@{/}">맛있으면 0 칼로리</a>
+            <!-- 로고 END -->
+
+            <!-- 헤더 네비 Toggle button START -->
+            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenuCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- 헤더 네비 Toggle button END -->
+
+            <!-- 헤더 네비 START -->
+            <div class="collapse navbar-collapse w-100  justify-content-between" id="mainMenuCollapse">
+                <ul class="navbar-nav d-flex justify-content-evenly w-75">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" th:href="@{/notice/board}">공지사항</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" th:href="@{/review/board}">리뷰</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" th:href="@{/shop/board}">가게</a>
+                    </li>
+                </ul>
+
+                <div class="nav flex-nowrap align-items-center w-25 justify-content-start me-5 justify-content-md-around">
+                    <div class="nav-item" sec:authorize="isAnonymous()">
+                        <a href="#" th:href="@{/members/login}" class="btn btn-success">로그인</a>
+                    </div>
+                    <div class="nav-item" sec:authorize="isAuthenticated()">
+                        <a href="#" th:href="@{/logout}" class="btn btn-success">로그아웃</a>
+                    </div>
+                    <div class="nav-item" sec:authorize="isAuthenticated()">
+                        <a href="#sideMenu" class="nav-link" data-bs-toggle="offcanvas">
+                            <img src="https://via.placeholder.com/250" th:src="${headerMemberImg}" alt="" class="profile">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 헤더 네비 END -->
+        </div>
+
+    </nav>
+
+    <!-- canvas START -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="sideMenu" sec:authorize="isAuthenticated()">
+        <div class="offcanvas-header justify-content-end">
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column pt-0">
+            <div>
+                <p>환영합니다.</p>
+                <ul class="nav d-block flex-column my-4">
+                    <li class="nav-item h5"><a href="#" th:href="@{/members/myInfo}" class="nav-link">프로필 변경</a></li>
+
+                    <!-- 관리자 전용 -->
+                    <li class="nav-item h5"><a href="#" th:href="@{/banner/board}" class="nav-link" sec:authorize="hasRole('ADMIN')">배너관리</a></li>
+
+                    <li class="nav-item h5"><a href="/logout" class="nav-link">로그아웃</a></li>
+                </ul>
+            </div>
+            <div class="mt-auto pb-3">
+                <p class="text-body mb-2 fw-bold">대한민국 서울특별시</p>
+                <p class="mb-2">연락처: 02-000-0000</p>
+            </div>
+        </div>
+    </div>
+    <!-- canvas END -->
+</header>
+
+</html>

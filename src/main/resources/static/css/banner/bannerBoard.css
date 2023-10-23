@@ -1,0 +1,42 @@
+main {
+    min-height: 50vh;
+    overflow: overlay;
+}
+
+main::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+main::-webkit-scrollbar-thumb {
+    border-radius: .5rem;
+    background: #0005;
+    visibility: hidden;
+}
+
+main:hover::-webkit-scrollbar-thumb {
+    visibility: visible;
+}
+
+article {
+    background: #fff9;
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    box-shadow: 0 .5rem .5rem #0005;
+    margin: auto;
+}
+
+
+tbody tr img {
+    max-width: 240px;
+    aspect-ratio: 16/9;
+    cursor: pointer;
+}
+
+table th {
+    text-align: center;
+}
+
+table, th, tr, td {
+    padding: 1rem;
+}
